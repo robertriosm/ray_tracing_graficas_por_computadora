@@ -2,7 +2,9 @@ import struct
 from collections import namedtuple
 import numpy as np
 from math import cos, sin, tan, pi
+from experiments import vector_by_const
 from object import Obj
+from rmath import inverse_matrix, matrix_product, normalize
 
 
 V2 = namedtuple('Point2', ['x', 'y'])
@@ -177,14 +179,17 @@ class Raytracer(object):
                 Py = ((y + 0.5 - self.vpY) / self.vpHeight) * 2 - 1
 
                 # Proyeccion
-                t = tan((self.fov * np.pi / 180) / 2) * self.nearPlane
+                t = tan((self.fov * pi / 180) / 2) * self.nearPlane
                 r = t * self.vpWidth / self.vpHeight
 
                 Px *= r
                 Py *= t
 
+                # direction = [Px, Py, -self.nearPlane]
+                # direction = vector_by_const(direction, normalize(direction)) # matrix division
+
                 direction = V3(Px, Py, -self.nearPlane)
-                direction = direction / np.linalg.norm(direction)
+                direction = direction / np.linalg.norm(direction) #           V3(direction[0],direction[1],direction[2])
 
                 rayColor = self.cast_ray(self.camPosition, direction)
 

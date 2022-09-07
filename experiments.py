@@ -1,24 +1,18 @@
 import numpy as np
 
-mat = np.array([2,2,2])
+#from gl import V3
 
-ye = mat * -1
 
-mat1 = [[2,2,2], [2,2,2], [2,2,2]]
 
-def const_x_matrix(A: list, a: int or float):
-    res = []
-    for i in A:
-        for j in A:
-            
-    res = [0*i for i in A]
-    for i in res:
-        for j in i:
-            j = j*a
-    return res
+def matrix_by_const(A: list[list[int or float]], a: int or float):
+    return [[a*j for j in A[i]] for i in range(len(A))]
 
-ye2 = mat1 * -1
 
-print(ye2)
+def vector_by_const(A: list[int or float] or tuple[int or float], a: float or int):
+    return [i*a for i in A]
 
-print(const_x_matrix(mat1, -1))
+x = [[1,2], [3,4]]
+v = [1,2,3,4]
+
+ye = np.linalg.norm(x)
+

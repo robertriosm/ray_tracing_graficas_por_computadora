@@ -1,4 +1,5 @@
 import numpy as np
+from rmath import normalize, subtract
 
 WHITE = (1,1,1)
 BLACK = (0,0,0)
@@ -25,6 +26,10 @@ class Sphere(object):
         L = np.subtract(self.center, orig)
         tca = np.dot(L, dir)
         d = (np.linalg.norm(L) ** 2 - tca ** 2) ** 0.5
+
+        # L = subtract([self.center[0], self.center[1], self.center[2]], [orig[0], orig[1], orig[2]])
+        # tca = np.dot(L, dir)
+        # d = (np.linalg.norm(L) ** 2 - tca ** 2) ** 0.5
 
         if d > self.radius:
             return None
