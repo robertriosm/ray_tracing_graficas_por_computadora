@@ -1,7 +1,6 @@
 
 from experiments import vector_by_const
-from rmath import normalize
-import numpy as np
+from rmath import normalize_vector
 
 DIR_LIGHT = 0
 POINT_LIGHT = 1
@@ -9,10 +8,7 @@ AMBIENT_LIGHT = 2
 
 class DirectionalLight(object):
     def __init__(self, direction = (0,-1,0), intensity = 1, color = (1,1,1)):
-        normalized = np.linalg.norm(direction)
-        mynormalized = normalize(direction)
-        self.direction = direction / normalized
-        # self.direction = vector_by_const(direction, 1/normalize(direction))
+        self.direction = vector_by_const(direction, 1/normalize_vector(direction))
         self.intensity = intensity
         self.color = color
         self.lightType = DIR_LIGHT

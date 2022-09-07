@@ -1,5 +1,6 @@
 
 from math import sqrt
+from os import listdir
 
 
 def matrix_product(A, B):
@@ -60,9 +61,11 @@ def cross_product(A: list, B: list):
     
 
 def normalize(A: list):
-    return sqrt(((A[0] - A[1]) ** 2)
-              + ((A[1] - A[2]) ** 2)
-              + ((A[2] - A[0]) ** 2))
+    return sqrt(((A[0] - A[1]) ** 2) + ((A[1] - A[2]) ** 2) + ((A[2] - A[0]) ** 2))
+
+
+def normalize_vector(A: list):
+    return sqrt(sum(i**2 for i in A))
 
 
 def eliminate(r1, r2, col, target=0):
