@@ -1,6 +1,5 @@
 
 from math import sqrt
-from os import listdir
 
 
 def matrix_product(A, B):
