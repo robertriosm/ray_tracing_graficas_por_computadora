@@ -1,6 +1,3 @@
-import numpy as np
-
-#from gl import V3
 
 
 def matrix_by_const(A: list[list[int or float]], a: int or float):

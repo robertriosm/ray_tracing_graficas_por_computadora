@@ -1,10 +1,8 @@
 import struct
 from collections import namedtuple
-import numpy as np
-from math import cos, sin, tan, pi
-from experiments import add_matrices, add_vectors, vector_by_const
-from object import Obj
-from rmath import dot, inverse_matrix, matrix_product, multiply_vectors, normalize
+from math import tan, pi
+from experiments import add_vectors, vector_by_const
+from rmath import dot, normalize_vector, vectors_product
 
 
 V2 = namedtuple('Point2', ['x', 'y'])
@@ -129,15 +127,14 @@ class Raytracer(object):
         finalColor = [0,0,0]
         objectColor = [material.diffuse[0], material.diffuse[1], material.diffuse[2]]
 
-        dirLightColor =[0,0,0]
-        ambLightColor =[0,0,0]
+        dirLightColor = [0,0,0]
+        ambLightColor = [0,0,0]
 
 
         for light in self.lights:
             if light.lightType == 0: # directional light
                 diffuseColor = [0,0,0]
 
-                # light_dir = np.array(light.direction) * -1
                 light_dir = vector_by_const(light.direction, -1)
                 intensity = dot(intersect.normal, light_dir)
                 intensity = float(max(0, intensity))
@@ -153,16 +150,15 @@ class Raytracer(object):
                 if shadow_intersect:
                     shadow_intensity = 1
 
-                #dirLightColor = np.add(dirLightColor, diffuseColor * (1 - shadow_intensity))
                 dirLightColor = add_vectors(dirLightColor, vector_by_const(diffuseColor, 1 - shadow_intensity))
 
             elif light.lightType == 2: # ambient light
-                # ambLightColor = (light.color) * light.intensity
-                ambLightColor =multiply_vectors(light.color, light.intensity)
+                #ambLightColor = (light.color) * light.intensity
+                ambLightColor = vector_by_const(light.color, light.intensity)
 
         finalColor = add_vectors(dirLightColor, ambLightColor) #dirLightColor + ambLightColor
 
-        finalColor = multiply_vectors(finalColor, objectColor) # objectColor
+        finalColor = vectors_product(finalColor, objectColor) # objectColor
 
         r = min(1, finalColor[0])
         g = min(1, finalColor[1])
@@ -186,11 +182,8 @@ class Raytracer(object):
                 Px *= r
                 Py *= t
 
-                # direction = [Px, Py, -self.nearPlane]
-                # direction = vector_by_const(direction, normalize(direction)) # matrix division
-
-                direction = V3(Px, Py, -self.nearPlane)
-                direction = direction / np.linalg.norm(direction) #           V3(direction[0],direction[1],direction[2])
+                direction = [Px, Py, -self.nearPlane]
+                direction = vector_by_const (direction, 1/normalize_vector(direction)) #           V3(direction[0],direction[1],direction[2])
 
                 rayColor = self.cast_ray(self.camPosition, direction)
 

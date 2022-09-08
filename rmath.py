@@ -32,6 +32,12 @@ def multiply_vectors(matrix: list, v):
     return [dot(r, v) for r in matrix]
 
 
+def vectors_product(v1: list, v2: list):
+    res = [i for i in v1]
+    for i in range(len(v1)):
+        res[i] = v1[i] * v2[i]
+    return res
+
 def subtract(A: list, B: list):
      size = isinstance(A, list) + 2 * isinstance(B, list)
      if size == 3:
