@@ -4,7 +4,7 @@ from os import listdir
 
 
 def matrix_product(A, B):
-    result = [[x * 0 for x in range(4)] for i in range(4)]
+    result = [[x * 0 for x in range(len(A[0]))] for i in range(len(A))]
     for i in range(len(A)):
         for j in range(len(B[0])):
             for k in range(len(B)):
@@ -43,7 +43,7 @@ def subtract(A: list, B: list):
      return A - B
 
 
-def add(A: list, B: list):
+def add(A, B):
      size = isinstance(A, list) + 2 * isinstance(B, list)
      if size == 3:
          return [add(ra,rb) for ra,rb in zip(A,B)]

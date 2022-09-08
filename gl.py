@@ -2,9 +2,9 @@ import struct
 from collections import namedtuple
 import numpy as np
 from math import cos, sin, tan, pi
-from experiments import vector_by_const
+from experiments import add_matrices, add_vectors, vector_by_const
 from object import Obj
-from rmath import inverse_matrix, matrix_product, normalize
+from rmath import dot, inverse_matrix, matrix_product, multiply_vectors, normalize
 
 
 V2 = namedtuple('Point2', ['x', 'y'])
@@ -127,25 +127,24 @@ class Raytracer(object):
         material = intersect.sceneObj.material
 
         finalColor = [0,0,0]
-        objectColor = np.array([material.diffuse[0],
-                                material.diffuse[1],
-                                material.diffuse[2]])
+        objectColor = [material.diffuse[0], material.diffuse[1], material.diffuse[2]]
 
-        dirLightColor = np.array([0,0,0])
-        ambLightColor = np.array([0,0,0])
+        dirLightColor =[0,0,0]
+        ambLightColor =[0,0,0]
 
 
         for light in self.lights:
             if light.lightType == 0: # directional light
-                diffuseColor = np.array([0,0,0])
+                diffuseColor = [0,0,0]
 
-                light_dir = np.array(light.direction) * -1
-                intensity = np.dot(intersect.normal, light_dir)
+                # light_dir = np.array(light.direction) * -1
+                light_dir = vector_by_const(light.direction, -1)
+                intensity = dot(intersect.normal, light_dir)
                 intensity = float(max(0, intensity))
 
-                diffuseColor = np.array([intensity * light.color[0] * light.intensity,
-                                         intensity * light.color[1] * light.intensity,
-                                         intensity * light.color[2] * light.intensity])
+                diffuseColor = [intensity * light.color[0] * light.intensity,
+                                intensity * light.color[1] * light.intensity,
+                                intensity * light.color[2] * light.intensity]
 
                 #Shadows
                 shadow_intensity = 0
@@ -154,14 +153,16 @@ class Raytracer(object):
                 if shadow_intersect:
                     shadow_intensity = 1
 
-                dirLightColor = np.add(dirLightColor, diffuseColor * (1 - shadow_intensity))
+                #dirLightColor = np.add(dirLightColor, diffuseColor * (1 - shadow_intensity))
+                dirLightColor = add_vectors(dirLightColor, vector_by_const(diffuseColor, 1 - shadow_intensity))
 
             elif light.lightType == 2: # ambient light
-                ambLightColor = np.array(light.color) * light.intensity
+                # ambLightColor = (light.color) * light.intensity
+                ambLightColor =multiply_vectors(light.color, light.intensity)
 
-        finalColor = dirLightColor + ambLightColor
+        finalColor = add_vectors(dirLightColor, ambLightColor) #dirLightColor + ambLightColor
 
-        finalColor *= objectColor
+        finalColor = multiply_vectors(finalColor, objectColor) # objectColor
 
         r = min(1, finalColor[0])
         g = min(1, finalColor[1])
