@@ -2,8 +2,8 @@ from gl import Raytracer, V3
 from figures import *
 from lights import *
 
-width = 640
-height = 480
+width = 640*2
+height = 480*2
 
 # Materiales
 
