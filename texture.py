@@ -1,5 +1,8 @@
 
 import struct
+from math import pi, acos,atan2
+
+from rmath import normalize_vector
 
 class Texture(object):
     def __init__(self, filename):
@@ -32,3 +35,11 @@ class Texture(object):
             return self.pixels[int(v * self.height)][int(u * self.width)]
         else:
             return None
+    
+    def getEnvColor(self, dir):
+        dir = dir / normalize_vector(dir)
+
+        x = int((atan2(dir[2], dir[0]) / (2 * pi) + 0.5) * self.width)
+        y = int(acos(-dir[1]) / pi * self.height)
+
+        return self.pixels[y][x]

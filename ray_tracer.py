@@ -1,49 +1,38 @@
 from gl import Raytracer, V3
+from texture import *
 from figures import *
 from lights import *
 
-width = 640*2
-height = 480*2
+
+width = 1024
+height = 1024
 
 # Materiales
 
-#brick = Material(diffuse = (0.8, 0.3, 0.3))
-# stone = Material(diffuse = (0.4, 0.4, 0.4))
-grass = Material(diffuse = (0.3, 1, 0.3))
-snow = Material(diffuse = (0.8, 0.8, 0.8))
-carbon = Material(diffuse = (0.3, 0.3, 0.3))
-carrot = Material(diffuse = (0.98, 0.5, 0.01))
-eye = Material(diffuse = (1, 1, 0.95))
-cursed_eyes = Material(diffuse = (1, 0, 0))
+brick = Material(diffuse = (0.8, 0.3, 0.3), spec = 16)
+stone = Material(diffuse = (0.4, 0.4, 0.4), spec = 8)
+
+mirror = Material(diffuse = (0.9, 0.9, 0.9), spec = 64, matType = REFLECTIVE)
+blueMirror = Material(diffuse = (0.2, 0.2, 0.9), spec = 64, matType = REFLECTIVE)
+yellowMirror = Material(diffuse = (0.9, 0.9, 0.2), spec = 64, matType = REFLECTIVE)
 
 rtx = Raytracer(width, height)
 
-rtx.lights.append(AmbientLight( ))
-rtx.lights.append(DirectionalLight(direction = (0,0,-1)))
+rtx.envMap = Texture("parkingLot.bmp")
 
-#cuerpo
-rtx.scene.append(Sphere(V3(0,-2,-10), 2.5, snow))
-rtx.scene.append(Sphere(V3(0,1,-10), 2, snow))
-rtx.scene.append(Sphere(V3(0,3,-10), 1.5, snow))
+rtx.lights.append( AmbientLight(intensity = 0.1 ))
+rtx.lights.append( DirectionalLight(direction = (-1,-1,-1), intensity = 0.8 ))
+#rtx.lights.append( PointLight(point = (0,0,0)))
 
-#botones
-rtx.scene.append(Sphere(V3(0,-1.8,-7.5), 0.3, carbon))
-rtx.scene.append(Sphere(V3(0,1,-8), 0.3, carbon))
-rtx.scene.append(Sphere(V3(0,-0.1,-8), 0.3, carbon))
+rtx.scene.append( Sphere(V3(0,0,-10), 1, mirror)  )
 
-# cara
-rtx.scene.append(Sphere(V3(-0.75,2.7,-8.55), 0.1, carbon))
-rtx.scene.append(Sphere(V3(-0.25,2.5,-8.45), 0.1, carbon))
-rtx.scene.append(Sphere(V3(0.25,2.5,-8.45), 0.1, carbon))
-rtx.scene.append(Sphere(V3(0.75,2.7,-8.55), 0.1, carbon))
+rtx.scene.append( Sphere(V3(3,0,-10), 1, brick)  )
+rtx.scene.append( Sphere(V3(0,3,-10), 1, stone)  )
 
-rtx.scene.append(Sphere(V3(0,3,-8.5), 0.3, carrot))
+rtx.scene.append( Sphere(V3(-3,0,-10),1, blueMirror)  )
+rtx.scene.append( Sphere(V3(0,-3,-10), 1, yellowMirror)  )
 
-rtx.scene.append(Sphere(V3(-0.5,3.3,-8.5), 0.2, eye))
-rtx.scene.append(Sphere(V3(0.5,3.3,-8.5), 0.2, eye))
-rtx.scene.append(Sphere(V3(-0.5,3.2,-8.35), 0.1, cursed_eyes))
-rtx.scene.append(Sphere(V3(0.5,3.2,-8.35), 0.1, cursed_eyes))
 
 rtx.glRender()
 
-rtx.glFinish("snowman.bmp")
+rtx.glFinish("output.bmp")

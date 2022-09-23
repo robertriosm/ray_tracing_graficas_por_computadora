@@ -3,7 +3,13 @@ from collections import namedtuple
 from math import tan, pi
 from experiments import add_vectors, vector_by_const
 from rmath import dot, normalize_vector, vectors_product
+import numpy as np
+from figures import *
+from lights import *
+from object import Obj
 
+STEPS = 1
+MAX_RECURSION_DEPTH = 3
 
 V2 = namedtuple('Point2', ['x', 'y'])
 V3 = namedtuple('Point3', ['x', 'y', 'z'])
@@ -65,6 +71,12 @@ class Raytracer(object):
         self.clearColor = color(0,0,0)
         self.currColor = color(1,1,1)
 
+        self.envMap = None
+
+
+        self.clearColor = color(0,0,0)
+        self.currColor = color(1,1,1)
+
         self.glViewport(0,0,self.width, self.height)
         
         self.glClear()
@@ -116,11 +128,16 @@ class Raytracer(object):
         return intersect
 
 
-    def cast_ray(self, orig, dir):
+    def cast_ray(self, orig, dir, sceneObj = None, recursion = 0):
         intersect = self.scene_intersect(orig, dir, None)
 
-        if intersect == None:
-            return None
+        if intersect == None or recursion >= MAX_RECURSION_DEPTH:
+            if self.envMap:
+                return self.envMap.getEnvColor(dir)
+            else:
+                return (self.clearColor[0] / 255,
+                        self.clearColor[1] / 255,
+                        self.clearColor[2] / 255)
 
         material = intersect.sceneObj.material
 
@@ -131,32 +148,53 @@ class Raytracer(object):
         ambLightColor = [0,0,0]
 
 
-        for light in self.lights:
-            if light.lightType == 0: # directional light
-                diffuseColor = [0,0,0]
+        # for light in self.lights:
+        #     if light.lightType == 0: # directional light
+        #         diffuseColor = [0,0,0]
 
-                light_dir = vector_by_const(light.direction, -1)
-                intensity = dot(intersect.normal, light_dir)
-                intensity = float(max(0, intensity))
+        #         light_dir = vector_by_const(light.direction, -1)
+        #         intensity = dot(intersect.normal, light_dir)
+        #         intensity = float(max(0, intensity))
 
-                diffuseColor = [intensity * light.color[0] * light.intensity,
-                                intensity * light.color[1] * light.intensity,
-                                intensity * light.color[2] * light.intensity]
+        #         diffuseColor = [intensity * light.color[0] * light.intensity,
+        #                         intensity * light.color[1] * light.intensity,
+        #                         intensity * light.color[2] * light.intensity]
 
-                #Shadows
-                shadow_intensity = 0
-                shadow_intersect = self.scene_intersect(intersect.point, light_dir, intersect.sceneObj)
+        #         #Shadows
+        #         shadow_intensity = 0
+        #         shadow_intersect = self.scene_intersect(intersect.point, light_dir, intersect.sceneObj)
                 
-                if shadow_intersect:
-                    shadow_intensity = 1
+        #         if shadow_intersect:
+        #             shadow_intensity = 1
 
-                dirLightColor = add_vectors(dirLightColor, vector_by_const(diffuseColor, 1 - shadow_intensity))
+        #         dirLightColor = add_vectors(dirLightColor, vector_by_const(diffuseColor, 1 - shadow_intensity))
 
-            elif light.lightType == 2: # ambient light
-                #ambLightColor = (light.color) * light.intensity
-                ambLightColor = vector_by_const(light.color, light.intensity)
+        #     elif light.lightType == 2: # ambient light
+        #         #ambLightColor = (light.color) * light.intensity
+        #         ambLightColor = vector_by_const(light.color, light.intensity)
 
-        finalColor = add_vectors(dirLightColor, ambLightColor) #dirLightColor + ambLightColor
+        # finalColor = add_vectors(dirLightColor, ambLightColor) #dirLightColor + ambLightColor
+
+        if material.matType == OPAQUE:
+            for light in self.lights:
+                diffuseColor = light.getDiffuseColor(intersect, self)
+                specColor = light.getSpecColor(intersect, self)
+                shadowIntensity = light.getShadowIntensity(intersect, self)
+
+                lightColor = (diffuseColor + specColor) * (1 - shadowIntensity)
+
+                finalColor = np.add(finalColor, lightColor)
+
+        elif material.matType == REFLECTIVE:
+            reflect = reflectVector(intersect.normal, np.array(dir) * -1)
+            reflectColor = self.cast_ray(intersect.point, reflect, intersect.sceneObj, recursion + 1)
+            reflectColor = np.array(reflectColor)
+
+            specColor = np.array([0,0,0])
+            for light in self.lights:
+                specColor = np.add(specColor, light.getSpecColor(intersect, self))
+
+            finalColor = reflectColor + specColor
 
         finalColor = vectors_product(finalColor, objectColor) # objectColor
 
