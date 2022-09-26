@@ -26,6 +26,25 @@ def identity(num):
 def dot(A: list, B: list):
     return sum([x * y for x,y in zip(A, B)])
 
+def magnitud_vector(vector: list):
+    sum = 0
+    for comp in vector:
+        sum += comp**2
+    return sum**0.5
+
+def normalizaVector(vector: list):
+    magnitud = magnitud_vector(vector)
+    return [a/magnitud for a in vector]
+
+
+def productoPunto(vector_1, vector_2):
+    if len(vector_1)!=len(vector_2):
+        raise Exception ("No match on vector dimensions")
+    total = 0
+    for componente_i in range(len(vector_1)):
+        total += vector_1[componente_i]*vector_2[componente_i]
+    return total
+
 
 def multiply_vectors(matrix: list, v):
     return [dot(r, v) for r in matrix]
@@ -37,6 +56,7 @@ def vectors_product(v1: list, v2: list):
         res[i] = v1[i] * v2[i]
     return res
 
+
 def subtract(A: list, B: list):
      size = isinstance(A, list) + 2 * isinstance(B, list)
      if size == 3:
@@ -46,6 +66,17 @@ def subtract(A: list, B: list):
      if size == 1: 
          return [subtract(ra,B) for ra in A]
      return A - B
+
+
+def suma_o_resta_vectores(vector_1: list, vector_2: list, is_resta: bool = False):
+    factor = -1 if is_resta else 1
+    if not len(vector_2)==len(vector_1):
+        print("Dimensiones de vectores no coiniciden")
+        return
+    vector_res = []
+    for i in range(len(vector_1)):
+        vector_res.append(vector_1[i]+factor*vector_2[i])
+    return vector_res
 
 
 def add(A, B):
@@ -63,7 +94,7 @@ def cross_product(A: list, B: list):
     return [A[1] * B[2] - A[2] * B[1],
             A[2] * B[0] - A[0] * B[2],
             A[0] * B[1] - A[1] * B[0]]
-    
+
 
 def normalize(A: list):
     return sqrt(((A[0] - A[1]) ** 2) + ((A[1] - A[2]) ** 2) + ((A[2] - A[0]) ** 2))
@@ -72,6 +103,7 @@ def normalize(A: list):
 def normalize_vector(A: list):
     return sqrt(sum(i**2 for i in A))
 
+# def normalize_matrix()
 
 def eliminate(r1, r2, col, target=0):
     fac = (r2[col]-target) / r1[col]
@@ -116,3 +148,11 @@ def gauss(a):
         eliminate(a[i], a[i], i, target=1)
 
     return a
+
+def add_vectors(v1:list, v2:list):
+    result= [0,0,0]
+    for i in range(len(v1)):
+        result[i] = v1[i] + v2[i]
+    
+def multiply_2_vectors(v1, v2):
+    return [v1[i] * v2[i] for i in range(len(v1))]

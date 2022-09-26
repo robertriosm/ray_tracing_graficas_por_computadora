@@ -1,19 +1,62 @@
 
 from experiments import vector_by_const
-from rmath import normalize_vector
+from rmath import multiply_vectors, normalizaVector, normalize_vector, dot, productoPunto, subtract, suma_o_resta_vectores, vectors_product
 import numpy as np
 
 DIR_LIGHT = 0
 POINT_LIGHT = 1
 AMBIENT_LIGHT = 2
 
-def reflectVector(normal, direction):
-    reflect = 2 * np.dot(normal, direction)
-    reflect = np.multiply(reflect, normal)
-    reflect = np.subtract(reflect, direction)
-    reflect = reflect / np.linalg.norm(reflect)
-    return reflect
 
+def reflectVector(normal, direction):
+    reflect = 2 * productoPunto(normal, direction)
+    reflect = [n*reflect for n in normal]
+    reflect = suma_o_resta_vectores(reflect, direction, True)
+    return normalizaVector(reflect)
+
+def reflactVector(normal, direction, ior):
+    #Snell´s Law
+    cosi = max(-1, min(1, productoPunto(direction, normal)))
+    etai = 1
+    etat = ior
+
+    if cosi < 0:
+        cosi = -cosi
+    else: 
+        etai, etat = etat, etai
+        normal = [n * -1 for n in normal]
+
+    eta = etai / etat
+    k = 1 - (eta**2) * (1-(cosi**2))
+
+    if k < 0: #Total internal reflection
+        return None
+
+    R = suma_o_resta_vectores([eta *(d) for d in direction],  [(eta * cosi - k **0.5) * n for n in  normal])
+    return R
+    
+
+def fresnel(normal, direction, ior):
+    #Snell´s Law  
+    cosi = max(-1, min(1, productoPunto(direction, normal)))
+    etai = 1
+    etat = ior
+
+    if cosi > 0:
+        etai, etat = etat, etai
+    
+    sint = etai / etat * (max(0, 1 - cosi**2) ** 0.5)
+
+    if sint >= 1: #Total internal reflection
+        return 1
+    
+    cost = max(0, 1 - sint**2) ** 0.5
+    cosi = abs(cosi)
+
+    Rs = ((etat * cosi) - (etai * cosi)) / ((etat * cosi) + (etai * cost))
+    Rp = ((etai * cosi) - (etat * cosi)) / ((etai * cosi) + (etat * cost))
+
+    return (Rs**2 + Rp**2)/2
 
 class DirectionalLight(object):
     def __init__(self, direction = (0,-1,0), intensity = 1, color = (1,1,1)):

@@ -1,6 +1,7 @@
 
 import struct
 from math import pi, acos,atan2
+from experiments import vector_by_const
 
 from rmath import normalize_vector
 
@@ -37,7 +38,7 @@ class Texture(object):
             return None
     
     def getEnvColor(self, dir):
-        dir = dir / normalize_vector(dir)
+        dir = vector_by_const(dir, normalize_vector(dir))
 
         x = int((atan2(dir[2], dir[0]) / (2 * pi) + 0.5) * self.width)
         y = int(acos(-dir[1]) / pi * self.height)

@@ -1,7 +1,8 @@
 
 from experiments import vector_by_const
+from rmath import magnitud_vector, normalizaVector, productoPunto, suma_o_resta_vectores
+from math import pi, atan2, acos
 
-from rmath import dot, normalize_vector, subtract, add
 
 WHITE = (1,1,1)
 BLACK = (0,0,0)
@@ -11,15 +12,20 @@ REFLECTIVE = 1
 TRANSPARENT = 2
 
 class Intersect(object):
-    def __init__(self, distance, point, normal, sceneObj):
+    def __init__(self, distance, point, normal, sceneObj, textCoords):
         self.distance = distance
         self.point = point
         self.normal = normal
         self.sceneObj = sceneObj
+        self.textCoords = textCoords
 
 class Material(object):
-    def __init__(self, diffuse = WHITE):
+    def __init__(self, diffuse = WHITE, spec = 1.0, ior = 1.0, matType = OPAQUE, texture = None):
         self.diffuse = diffuse
+        self.spec = spec
+        self.ior = ior
+        self.matType = matType
+        self.texture = texture
 
 
 class Sphere(object):
@@ -29,12 +35,10 @@ class Sphere(object):
         self.material = material
 
     def ray_intersect(self, orig, dir):
-        L = subtract([self.center[0], self.center[1], self.center[2]], [orig[0], orig[1], orig[2]])
-        tca = dot(L, [dir[0], dir[1], dir[2]])
-        d = (normalize_vector(L) ** 2 - tca ** 2) ** 0.5
+        L = suma_o_resta_vectores(self.center, orig, True)
+        tca = productoPunto(L, dir)
+        d = (magnitud_vector(L) ** 2 - tca ** 2) ** 0.5
 
-        # tca = np.dot(L, dir)
-        # d = (np.linalg.norm(L) ** 2 - tca ** 2) ** 0.5
 
         if d > self.radius:
             return None
@@ -50,11 +54,16 @@ class Sphere(object):
             return None
         
         # P = O + t0 * D
-        P = add([orig[0],orig[1],orig[2]], vector_by_const([dir[0],dir[1],dir[2]], t0))
-        normal = subtract(P, [self.center[0], self.center[1], self.center[2]])
-        normal = vector_by_const(normal, 1/normalize_vector(normal)) 
+        P = suma_o_resta_vectores(orig, vector_by_const(dir, t0))
+        normal = suma_o_resta_vectores(P, self.center, True)
+        normal = normalizaVector(normal) 
+
+        u = atan2(normal[2], normal[0])/ (2 * pi) + 0.5
+        v = acos(-normal[1])/pi
+        uvs  = (u, v)
 
         return Intersect(distance = t0,
                          point = P,
                          normal = normal,
-                         sceneObj = self)
+                         sceneObj = self,
+                         textCoords = uvs)
