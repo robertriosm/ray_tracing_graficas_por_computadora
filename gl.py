@@ -150,7 +150,7 @@ class Raytracer(object):
             finalColor = [a+b for a, b in zip(reflectColor, specColor)]
         
         elif material.matType == TRANSPARENT:
-            outside = productoPunto(dir, intersect.normal) < 0 
+            outside = dot_product(dir, intersect.normal) < 0 
             bias = [i_n* 0.001 for i_n in intersect.normal ]
 
             specColor = [0,0,0]

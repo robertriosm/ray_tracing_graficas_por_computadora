@@ -1,7 +1,11 @@
 
+from multiprocessing.sharedctypes import SynchronizedString
+from tkinter.messagebox import NO
 from experiments import vector_by_const
-from rmath import magnitud_vector, normalizaVector, productoPunto, suma_o_resta_vectores
+from rmath import dot_product, magnitud_vector, normalizaVector, suma_o_resta_vectores
 from math import pi, atan2, acos
+
+import numpy as np
 
 
 WHITE = (1,1,1)
@@ -36,7 +40,7 @@ class Sphere(object):
 
     def ray_intersect(self, orig, dir):
         L = suma_o_resta_vectores(self.center, orig, True)
-        tca = productoPunto(L, dir)
+        tca = dot_product(L, dir)
         d = (magnitud_vector(L) ** 2 - tca ** 2) ** 0.5
 
 
@@ -67,3 +71,83 @@ class Sphere(object):
                          normal = normal,
                          sceneObj = self,
                          textCoords = uvs)
+
+
+# quitarle numpy:
+class Plane(object):
+    def __init__(self, position, normal, material) -> None:
+        self.position = position
+        self.normal = normal / np.linalg.norm(normal)
+        self.material = material
+    
+    def ray_intersect(self, orig, dir):
+        denom = np.dot(dir, self.normal)
+        #((planePos - origRayo) o normal) / (direccionrayo o normal) 
+
+        if abs(denom) > 0.0001:
+            num = np.dot(np.subtract(self.position, orig), self.normal)
+        
+            t = num / denom
+        
+            if t > 0:
+                P = np.add(orig, t * np.array(dir))
+                return Intersect(distance = t,
+                                 point = P,
+                                 normal = self.normal,
+                                 sceneObj = self,
+                                 textCoords = None)
+                            
+
+class AABB(object): # axis aligned bounding box
+    def __init__(self, position, size, material) -> None:
+        self.position = position
+        self.size = size
+        self.material = material
+
+        self.planes = []
+
+        halfSizes = [0,0,0]
+
+        halfSizes[0] = halfSizes[0] / 2
+        halfSizes[1] = halfSizes[1] / 2
+        halfSizes[2] = halfSizes[2] / 2
+
+
+        # sides
+        self.planes.append(Plane(position=np.add(position, (halfSizes[0], 0, 0)), normal=(1,0,0), material=material))
+        self.planes.append(Plane(position=np.add(position, (-halfSizes[0], 0, 0)), normal=(-1,0,0), material=material))
+
+        #up and down
+        self.planes.append(Plane(position=np.add(position, (0, halfSizes[1], 0)), normal=(0,1,0), material=material))
+        self.planes.append(Plane(position=np.add(position, (0, halfSizes[1], 0)), normal=(0,1,0), material=material))
+
+        #front back
+        self.planes.append(Plane(position=np.add(position, (0, 0, halfSizes[2])), normal=(0,0,1), material=material))
+        self.planes.append(Plane(position=np.add(position, (0, 0, halfSizes[2])), normal=(0,0,-1), material=material))
+
+        # infinite?
+        self.boundsMin = [0,0,0]
+        self.boundsMax = [0,0,0]
+
+        #margen de error
+        epsilon = 0.001
+
+        for i in range(3):
+            self.boundsMin[i] = self.position[i] - (epsilon + halfSizes[i])
+            self.boundsMax[i] = self.position[i] + (epsilon + halfSizes[i])
+
+    
+    def ray_intersect(self, orig, dir):
+        intersect = None
+        t = float('inf')
+
+        for plane in self.planes:
+            planeInter = plane.ray_intersect(orig, dir)
+
+            if planeInter is not None:
+                planePoint = planeInter.point
+
+                if (self.boundsMin[0] <= planePoint[0] <= self.boundsMax[0]) and (self.boundsMin[1] <= planePoint[1] <= self.boundsMax[1]) and (self.boundsMin[2] <= planePoint[2] <= self.boundsMax[2]):
+                    if planeInter.distance < t:
+                        intersect = planeInter
+        

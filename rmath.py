@@ -37,7 +37,7 @@ def normalizaVector(vector: list):
     return [a/magnitud for a in vector]
 
 
-def productoPunto(vector_1, vector_2):
+def dot_product(vector_1, vector_2):
     if len(vector_1)!=len(vector_2):
         raise Exception ("No match on vector dimensions")
     total = 0
@@ -103,7 +103,6 @@ def normalize(A: list):
 def normalize_vector(A: list):
     return sqrt(sum(i**2 for i in A))
 
-# def normalize_matrix()
 
 def eliminate(r1, r2, col, target=0):
     fac = (r2[col]-target) / r1[col]

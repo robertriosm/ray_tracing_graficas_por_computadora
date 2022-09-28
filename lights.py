@@ -1,6 +1,6 @@
 
 from experiments import vector_by_const
-from rmath import multiply_vectors, normalizaVector, normalize_vector, dot, productoPunto, subtract, suma_o_resta_vectores, vectors_product
+from rmath import multiply_vectors, normalizaVector, normalize_vector, dot, dot_product, subtract, suma_o_resta_vectores, vectors_product
 import numpy as np
 
 DIR_LIGHT = 0
@@ -9,14 +9,14 @@ AMBIENT_LIGHT = 2
 
 
 def reflectVector(normal, direction):
-    reflect = 2 * productoPunto(normal, direction)
+    reflect = 2 * dot_product(normal, direction)
     reflect = [n*reflect for n in normal]
     reflect = suma_o_resta_vectores(reflect, direction, True)
     return normalizaVector(reflect)
 
 def reflactVector(normal, direction, ior):
     #Snell´s Law
-    cosi = max(-1, min(1, productoPunto(direction, normal)))
+    cosi = max(-1, min(1, dot_product(direction, normal)))
     etai = 1
     etat = ior
 
@@ -38,7 +38,7 @@ def reflactVector(normal, direction, ior):
 
 def fresnel(normal, direction, ior):
     #Snell´s Law  
-    cosi = max(-1, min(1, productoPunto(direction, normal)))
+    cosi = max(-1, min(1, dot_product(direction, normal)))
     etai = 1
     etat = ior
 
