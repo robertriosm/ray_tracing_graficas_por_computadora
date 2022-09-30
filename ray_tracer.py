@@ -1,6 +1,6 @@
 from gl import Raytracer, V3
 from texture import Texture
-from figures import TRANSPARENT, Plane, Sphere, Material, REFLECTIVE, OPAQUE
+from figures import AABB, TRANSPARENT, Disk, Plane, Sphere, Material, REFLECTIVE, OPAQUE
 from lights import AmbientLight, DirectionalLight
 
 
@@ -32,9 +32,25 @@ rtx.lights.append( DirectionalLight(direction = (-1,-1,-1), intensity = 0.9 ))
 # rtx.scene.append( Sphere(V3(3,2,-10), 1, mirror3)  )
 # rtx.scene.append( Sphere(V3(3,-2,-10), 1, mirror4)  )
 
-rtx.scene.append( Plane(position=(0, 0, -20), normal=(0,1,0), material=brick) )
+rtx.scene.append( Sphere(V3(0,0,-10), 1, stone)  )
 
-# rtx.
+
+# rt3 here =======================================
+# # up down
+# rtx.scene.append( Plane(position=(0, -5, -10), normal=(0,1,0), material=mirror3) )
+# rtx.scene.append( Plane(position=(0, 5, -10), normal=(0,-1,0), material=mirror2) )
+
+# # sides
+# rtx.scene.append( Plane(position=(-5, 0, -10), normal=(1,0,0), material=mirror) )
+# rtx.scene.append( Plane(position=(5, 0, -10), normal=(-1,0,0), material=mirror4) )
+
+# # back
+# rtx.scene.append( Plane(position=(0, 0, -20), normal=(0,0,1), material=brick) )
+
+# # rtx.scene.append( Disk(position=(0, -3, -10), normal=(0,1,0), radius=3, material=mirror4) )
+
+# rtx.scene.append( AABB(position=(0, 2, -10), size=(2,2,2), material=mirror2) )
+
 
 rtx.glRender()
 rtx.glFinish("output.bmp")

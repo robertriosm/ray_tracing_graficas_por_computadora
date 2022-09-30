@@ -1,6 +1,4 @@
 
-from multiprocessing.sharedctypes import SynchronizedString
-from tkinter.messagebox import NO
 from experiments import vector_by_const
 from rmath import dot_product, magnitud_vector, normalizaVector, suma_o_resta_vectores
 from math import pi, atan2, acos
@@ -77,15 +75,15 @@ class Sphere(object):
 class Plane(object):
     def __init__(self, position, normal, material) -> None:
         self.position = position
-        self.normal = normal / np.linalg.norm(normal)
+        self.normal = normalizaVector(normal)
         self.material = material
     
     def ray_intersect(self, orig, dir):
-        denom = np.dot(dir, self.normal)
+        denom = dot_product(dir, self.normal) # here!!
         #((planePos - origRayo) o normal) / (direccionrayo o normal) 
 
         if abs(denom) > 0.0001:
-            num = np.dot(np.subtract(self.position, orig), self.normal)
+            num = dot_product(np.subtract(self.position, orig), self.normal)
         
             t = num / denom
         
@@ -96,6 +94,7 @@ class Plane(object):
                                  normal = self.normal,
                                  sceneObj = self,
                                  textCoords = None)
+        return None 
                             
 
 class AABB(object): # axis aligned bounding box
@@ -115,15 +114,15 @@ class AABB(object): # axis aligned bounding box
 
         # sides
         self.planes.append(Plane(position=np.add(position, (halfSizes[0], 0, 0)), normal=(1,0,0), material=material))
-        self.planes.append(Plane(position=np.add(position, (-halfSizes[0], 0, 0)), normal=(-1,0,0), material=material))
+        self.planes.append(Plane(position=np.subtract(position, (-halfSizes[0], 0, 0)), normal=(-1,0,0), material=material))
 
         #up and down
         self.planes.append(Plane(position=np.add(position, (0, halfSizes[1], 0)), normal=(0,1,0), material=material))
-        self.planes.append(Plane(position=np.add(position, (0, halfSizes[1], 0)), normal=(0,1,0), material=material))
+        self.planes.append(Plane(position=np.subtract(position, (0, halfSizes[1], 0)), normal=(0,-1,0), material=material))
 
         #front back
         self.planes.append(Plane(position=np.add(position, (0, 0, halfSizes[2])), normal=(0,0,1), material=material))
-        self.planes.append(Plane(position=np.add(position, (0, 0, halfSizes[2])), normal=(0,0,-1), material=material))
+        self.planes.append(Plane(position=np.subtract(position, (0, 0, halfSizes[2])), normal=(0,0,-1), material=material))
 
         # infinite?
         self.boundsMin = [0,0,0]
@@ -149,5 +148,54 @@ class AABB(object): # axis aligned bounding box
 
                 if (self.boundsMin[0] <= planePoint[0] <= self.boundsMax[0]) and (self.boundsMin[1] <= planePoint[1] <= self.boundsMax[1]) and (self.boundsMin[2] <= planePoint[2] <= self.boundsMax[2]):
                     if planeInter.distance < t:
+                        t = planeInter.distance
                         intersect = planeInter
+
+                    # tex coords
+
+                    u,v = 0,0
+
+                    if abs(plane.normal[0]) > 0:
+                        u = (planeInter.point[1] - self.boundsMin[1]) / (self.boundsMax[1] - self.boundsMin[1])
+                        v = (planeInter.point[2] - self.boundsMin[2]) / (self.boundsMax[2] - self.boundsMin[2])
+                    elif abs(plane.normal[1]) > 0:
+                        u = (planeInter.point[0] - self.boundsMin[0]) / (self.boundsMax[0] - self.boundsMin[0])
+                        v = (planeInter.point[2] - self.boundsMin[2]) / (self.boundsMax[2] - self.boundsMin[2])
+                    elif abs(plane.normal[2]) > 0:
+                        u = (planeInter.point[0] - self.boundsMin[0]) / (self.boundsMax[0] - self.boundsMin[0])
+                        v = (planeInter.point[1] - self.boundsMin[1]) / (self.boundsMax[1] - self.boundsMin[1])
+
+        if intersect is None:
+            return None
         
+        return Intersect(
+            distance=t,
+            point=intersect.point,
+            normal=intersect.normal,
+            texcoords=(u, v),
+            sceneObj=self,
+        )
+
+class Disk(object):
+    def __init__(self, position, radius, normal, material) -> None:
+        self.plane = Plane(position, normal, material)
+        self.material = material
+        self.radius = radius
+    
+    def ray_intersect(self, orig, dir):
+        intersect = self.plane.ray_intersect(orig, dir)
+
+        if intersect is None:
+            return None
+
+        contact = np.subtract(intersect.point, self.plane.position)
+        contact = normalizaVector(contact)
+
+        if contact > self.radius:
+            return None
+        
+        return Intersect(distance=intersect.distance,
+                         point=intersect.point,
+                         normal=intersect.normal,
+                         sceneObj=self,
+                         textCoords=None)
