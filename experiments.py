@@ -7,6 +7,9 @@ def matrix_by_const(A: list[list[int or float]], a: int or float):
 def vector_by_const(A: list[int or float] or tuple[int or float], a: float or int):
     return [i*a for i in A]
 
+def vector_add_const(A: list[int or float] or tuple[int or float], a: float or int):
+    return [i+a for i in A]
+
 def add_matrices(A:list, B: list):
     res = [[0*j for j in A[i]] for i in range(len(A))]
     for i in range(len(A)):

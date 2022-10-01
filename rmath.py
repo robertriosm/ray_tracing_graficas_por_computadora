@@ -68,10 +68,9 @@ def subtract(A: list, B: list):
      return A - B
 
 
-def suma_o_resta_vectores(vector_1: list, vector_2: list, is_resta: bool = False):
-    factor = -1 if is_resta else 1
-    if not len(vector_2)==len(vector_1):
-        print("Dimensiones de vectores no coiniciden")
+def suma_o_resta_vectores(vector_1: list, vector_2: list, restar = False):
+    factor = -1 if restar else 1
+    if not len(vector_2) == len(vector_1):
         return
     vector_res = []
     for i in range(len(vector_1)):
