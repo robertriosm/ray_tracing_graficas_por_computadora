@@ -32,7 +32,7 @@ def magnitud_vector(vector: list):
         sum += comp**2
     return sum**0.5
 
-def normalizaVector(vector: list):
+def norm_vector(vector: list):
     magnitud = magnitud_vector(vector)
     return [a/magnitud for a in vector]
 

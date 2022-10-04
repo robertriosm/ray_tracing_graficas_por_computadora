@@ -1,6 +1,6 @@
 
 from experiments import vector_by_const
-from rmath import dot_product, magnitud_vector, normalizaVector, normalize_vector, suma_o_resta_vectores
+from rmath import dot_product, magnitud_vector, norm_vector, normalize_vector, suma_o_resta_vectores
 from math import pi, atan2, acos
 
 
@@ -57,7 +57,7 @@ class Sphere(object):
         # P = O + t0 * D
         P = suma_o_resta_vectores(orig, vector_by_const(dir, t0))
         normal = suma_o_resta_vectores(P, self.center, True)
-        normal = normalizaVector(normal) 
+        normal = norm_vector(normal) 
 
         u = atan2(normal[2], normal[0])/ (2 * pi) + 0.5
         v = acos(-normal[1])/pi
@@ -74,7 +74,7 @@ class Sphere(object):
 class Plane(object):
     def __init__(self, position, normal, material) -> None:
         self.position = position
-        self.normal = normalizaVector(normal)
+        self.normal = norm_vector(normal)
         self.material = material
     
     def ray_intersect(self, orig, dir):

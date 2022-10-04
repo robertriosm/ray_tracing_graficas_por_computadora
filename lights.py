@@ -1,6 +1,6 @@
 
 from experiments import vector_by_const
-from rmath import  normalizaVector, normalize_vector, dot_product, suma_o_resta_vectores
+from rmath import  norm_vector, normalize_vector, dot_product, suma_o_resta_vectores
 
 
 DIR_LIGHT = 0
@@ -12,7 +12,7 @@ def reflectVector(normal, direction):
     reflect = 2 * dot_product(normal, direction)
     reflect = [n*reflect for n in normal]
     reflect = suma_o_resta_vectores(reflect, direction, True)
-    return normalizaVector(reflect)
+    return norm_vector(reflect)
 
 def reflactVector(normal, direction, ior):
     #Snell´s Law
@@ -81,7 +81,7 @@ class DirectionalLight(object):
         reflect = reflectVector(intersect.normal, light_dir)
 
         view_dir = suma_o_resta_vectores( raytracer.camPosition, intersect.point, True)
-        view_dir = normalizaVector(view_dir)
+        view_dir = norm_vector(view_dir)
 
         spec_intensity = self.intensity * max(0, dot_product(view_dir, reflect)) ** intersect.sceneObj.material.spec
         specColor = ([spec_intensity * self.color[0],
@@ -111,7 +111,7 @@ class PointLight(object):
 
     def getDiffuseColor(self, intersect, raytracer):
         light_dir = suma_o_resta_vectores(self.point, intersect.point, True)
-        light_dir = normalizaVector(light_dir)
+        light_dir = norm_vector(light_dir)
 
         attenuation = 1.0
         intensity = dot_product(intersect.normal, light_dir) * attenuation
@@ -125,12 +125,12 @@ class PointLight(object):
 
     def getSpecColor(self, intersect, raytracer):
         light_dir = suma_o_resta_vectores(self.point, intersect.point, True)
-        light_dir = normalizaVector(light_dir)
+        light_dir = norm_vector(light_dir)
 
         reflect = reflectVector(intersect.normal, light_dir)
 
         view_dir = suma_o_resta_vectores( raytracer.camPosition, intersect.point, True)
-        view_dir = normalizaVector(view_dir)
+        view_dir = norm_vector(view_dir)
 
         attenuation = 1.0
 
@@ -143,7 +143,7 @@ class PointLight(object):
 
     def getShadowIntensity(self, intersect, raytracer):
         light_dir = suma_o_resta_vectores(self.point, intersect.point, True)
-        light_dir = normalizaVector(light_dir)
+        light_dir = norm_vector(light_dir)
 
         shadow_intensity = 0
         shadow_intersect = raytracer.scene_intersect(intersect.point, light_dir, intersect.sceneObj)

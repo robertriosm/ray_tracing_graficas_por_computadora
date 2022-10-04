@@ -202,7 +202,7 @@ class Raytracer(object):
                 Py *= t
 
                 direction = V3(Px, Py, -self.nearPlane)
-                direction = normalizaVector(direction)
+                direction = norm_vector(direction)
 
                 rayColor = self.cast_ray(self.camPosition, direction)
 
