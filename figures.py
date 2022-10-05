@@ -20,6 +20,7 @@ class Intersect(object):
         self.sceneObj = sceneObj
         self.textCoords = textCoords
 
+
 class Material(object):
     def __init__(self, diffuse = WHITE, spec = 1.0, ior = 1.0, matType = OPAQUE, texture = None):
         self.diffuse = diffuse
@@ -196,6 +197,7 @@ class AABB(object): # axis aligned bounding box
             sceneObj=self,
         )
 
+
 class Disk(object):
     def __init__(self, position, radius, normal, material) -> None:
         self.plane = Plane(position, normal, material)
@@ -219,3 +221,12 @@ class Disk(object):
                          normal=intersect.normal,
                          sceneObj=self,
                          textCoords=None)
+
+class Piramid(object):
+    def __init__(self, position, normal, material) -> None:
+        self.plane = Plane(position, normal, material)
+        self.material = material
+    
+    
+
+

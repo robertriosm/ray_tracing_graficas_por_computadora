@@ -14,6 +14,7 @@ def reflectVector(normal, direction):
     reflect = suma_o_resta_vectores(reflect, direction, True)
     return norm_vector(reflect)
 
+
 def reflactVector(normal, direction, ior):
     #Snell´s Law
     cosi = max(-1, min(1, dot_product(direction, normal)))
@@ -58,6 +59,7 @@ def fresnel(normal, direction, ior):
 
     return (Rs**2 + Rp**2)/2
 
+
 class DirectionalLight(object):
     def __init__(self, direction = (0,-1,0), intensity = 1, color = (1,1,1)):
         self.direction = vector_by_const(direction, 1/normalize_vector(direction))
@@ -76,6 +78,7 @@ class DirectionalLight(object):
 
         return diffuseColor
     
+
     def getSpecColor(self, intersect, raytracer):
         light_dir = vector_by_const(self.direction, -1)
         reflect = reflectVector(intersect.normal, light_dir)
@@ -90,6 +93,7 @@ class DirectionalLight(object):
 
         return specColor
     
+
     def getShadowIntensity(self, intersect, raytracer):
         light_dir = vector_by_const(self.direction, -1) 
 
@@ -100,6 +104,7 @@ class DirectionalLight(object):
 
         return shadow_intensity
     
+
 class PointLight(object):
     def __init__(self, point, constant = 1.0, linear = 0.1, quad = 0.05, color = (1,1,1)):
         self.point = point
@@ -108,6 +113,7 @@ class PointLight(object):
         self.quad = quad
         self.color = color
         self.lightType = POINT_LIGHT
+
 
     def getDiffuseColor(self, intersect, raytracer):
         light_dir = suma_o_resta_vectores(self.point, intersect.point, True)
@@ -122,6 +128,7 @@ class PointLight(object):
                             intensity * self.color[2]])
 
         return diffuseColor
+
 
     def getSpecColor(self, intersect, raytracer):
         light_dir = suma_o_resta_vectores(self.point, intersect.point, True)
@@ -141,6 +148,7 @@ class PointLight(object):
 
         return specColor
 
+
     def getShadowIntensity(self, intersect, raytracer):
         light_dir = suma_o_resta_vectores(self.point, intersect.point, True)
         light_dir = norm_vector(light_dir)
@@ -158,11 +166,14 @@ class AmbientLight(object):
         self.color = color
         self.lightType = AMBIENT_LIGHT
     
+
     def getDiffuseColor(self, intersect, raytracer):
         return vector_by_const(self.color, self.intensity)
 
+
     def getSpecColor(self, intersect, raytracer):
         return [0,0,0]
+
 
     def getShadowIntensity(self, intersect, raytracer):
         return 0

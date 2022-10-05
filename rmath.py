@@ -26,11 +26,13 @@ def identity(num):
 def dot(A: list, B: list):
     return sum([x * y for x,y in zip(A, B)])
 
+
 def magnitud_vector(vector: list):
     sum = 0
     for comp in vector:
         sum += comp**2
     return sum**0.5
+
 
 def norm_vector(vector: list):
     magnitud = magnitud_vector(vector)
@@ -147,10 +149,12 @@ def gauss(a):
 
     return a
 
+
 def add_vectors(v1:list, v2:list):
     result= [0,0,0]
     for i in range(len(v1)):
         result[i] = v1[i] + v2[i]
+
     
 def multiply_2_vectors(v1, v2):
     return [v1[i] * v2[i] for i in range(len(v1))]

@@ -18,18 +18,22 @@ def char(c):
     #1 byte
     return struct.pack('=c', c.encode('ascii'))
 
+
 def word(w):
     #2 bytes
     return struct.pack('=h', w)
+
 
 def dword(d):
     #4 bytes
     return struct.pack('=l', d)
 
+
 def color(r, g, b):
     return bytes([int(b * 255),
                   int(g * 255),
                   int(r * 255)] )
+
 
 def baryCoords(A, B, C, P):
 
@@ -48,6 +52,7 @@ def baryCoords(A, B, C, P):
         return -1, -1, -1
     else:
         return u, v, w
+
 
 class Raytracer(object):
     def __init__(self, width, height):
@@ -72,21 +77,26 @@ class Raytracer(object):
         
         self.glClear()
 
+
     def glViewport(self, posX, posY, width, height):
         self.vpX = posX
         self.vpY = posY
         self.vpWidth = width
         self.vpHeight = height
 
+
     def glClearColor(self, r, g, b):
         self.clearColor = color(r,g,b)
+
 
     def glColor(self, r, g, b):
         self.currColor = color(r,g,b)
 
+
     def glClear(self):
         self.pixels = [[ self.clearColor for y in range(self.height)]
                          for x in range(self.width)]
+
 
     def glClearViewport(self, clr = None):
         for x in range(self.vpX, self.vpX + self.vpWidth):
@@ -97,6 +107,7 @@ class Raytracer(object):
     def glPoint(self, x, y, clr = None): # Window Coordinates
         if (0 <= x < self.width) and (0 <= y < self.height):
             self.pixels[x][y] = clr or self.currColor
+
 
     def scene_intersect(self, orig, dir, sceneObj):
         depth = float('inf')
@@ -111,6 +122,7 @@ class Raytracer(object):
                         depth = hit.distance
 
         return intersect
+
 
     def cast_ray(self, orig, dir, sceneObj = None, recursion = 0):
         intersect = self.scene_intersect(orig, dir, sceneObj)
@@ -209,6 +221,7 @@ class Raytracer(object):
                 if rayColor is not None:
                     rayColor = color(rayColor[0],rayColor[1],rayColor[2])
                     self.glPoint(x, y, rayColor)
+
 
     def glFinish(self, filename):
         with open(filename, "wb") as file:

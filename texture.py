@@ -2,7 +2,6 @@
 import struct
 from math import pi, acos,atan2
 from experiments import vector_by_const
-
 from rmath import normalize_vector
 
 class Texture(object):
@@ -31,12 +30,14 @@ class Texture(object):
 
                 self.pixels.append(pixelRow)
 
+
     def getColor(self, u, v):
         if 0 <= u < 1 and 0 <= v < 1:
             return self.pixels[int(v * self.height)][int(u * self.width)]
         else:
             return None
     
+
     def getEnvColor(self, dir):
         dir = vector_by_const(dir, normalize_vector(dir))
 
