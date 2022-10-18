@@ -1,5 +1,5 @@
 
-from math import sqrt
+from math import acos, sqrt
 
 
 def matrix_product(A, B):
@@ -39,12 +39,12 @@ def norm_vector(vector: list):
     return [a/magnitud for a in vector]
 
 
-def dot_product(vector_1, vector_2):
-    if len(vector_1)!=len(vector_2):
-        raise Exception ("No match on vector dimensions")
+def dot_product(v1, v2):
+    if len(v1) != len(v2):
+        raise Exception ("dim(v1) != dim(v2)")
     total = 0
-    for componente_i in range(len(vector_1)):
-        total += vector_1[componente_i]*vector_2[componente_i]
+    for componente_i in range(len(v1)):
+        total += v1[componente_i]*v2[componente_i]
     return total
 
 
@@ -70,13 +70,13 @@ def subtract(A: list, B: list):
      return A - B
 
 
-def suma_o_resta_vectores(vector_1: list, vector_2: list, restar = False):
+def add_subtract(v1: list, v2: list, restar = False):
     factor = -1 if restar else 1
-    if not len(vector_2) == len(vector_1):
+    if not len(v2) == len(v1):
         return
     vector_res = []
-    for i in range(len(vector_1)):
-        vector_res.append(vector_1[i]+factor*vector_2[i])
+    for i in range(len(v1)):
+        vector_res.append(v1[i]+factor*v2[i])
     return vector_res
 
 
@@ -158,3 +158,6 @@ def add_vectors(v1:list, v2:list):
     
 def multiply_2_vectors(v1, v2):
     return [v1[i] * v2[i] for i in range(len(v1))]
+
+def angle_between(u, v):
+    return acos(dot_product(u,v)/(magnitud_vector(u)*magnitud_vector(v)))

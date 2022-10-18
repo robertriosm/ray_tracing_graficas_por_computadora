@@ -110,7 +110,7 @@ class Raytracer(object):
 
 
     def scene_intersect(self, orig, dir, sceneObj):
-        depth = float('inf')
+        depth = float("inf")
         intersect = None
 
         for obj in self.scene:
@@ -149,7 +149,7 @@ class Raytracer(object):
 
                 lightColor = [(1 - shadowIntensity)*(df+sC)for df, sC in zip(diffuseColor, specColor)]
 
-                finalColor = suma_o_resta_vectores(finalColor, lightColor)
+                finalColor = add_subtract(finalColor, lightColor)
 
         elif material.matType == REFLECTIVE:
             reflect = reflectVector(intersect.normal, [d * -1 for d in dir])
@@ -157,7 +157,7 @@ class Raytracer(object):
 
             specColor = [0,0,0]
             for light in self.lights:
-                specColor = suma_o_resta_vectores(specColor, light.getSpecColor(intersect, self))
+                specColor = add_subtract(specColor, light.getSpecColor(intersect, self))
 
             finalColor = [a+b for a, b in zip(reflectColor, specColor)]
         
@@ -167,11 +167,11 @@ class Raytracer(object):
 
             specColor = [0,0,0]
             for light in self.lights:
-                specColor = suma_o_resta_vectores(specColor, light.getSpecColor(intersect, self))
+                specColor = add_subtract(specColor, light.getSpecColor(intersect, self))
 
 
             reflect = reflectVector(intersect.normal, [ d* -1 for d in dir])
-            reflectOrigin = suma_o_resta_vectores(intersect.point, bias) if outside else suma_o_resta_vectores(intersect.point, bias, True)
+            reflectOrigin = add_subtract(intersect.point, bias) if outside else add_subtract(intersect.point, bias, True)
             reflectColor = self.cast_ray(reflectOrigin, reflect, None, recursion + 1)
 
             kr = fresnel(intersect.normal, dir, material.ior)
@@ -179,10 +179,10 @@ class Raytracer(object):
 
             if kr < 1:
                 refract = reflactVector(intersect.normal, dir, material.ior)
-                refractOrigin = suma_o_resta_vectores(intersect.point, bias, True) if outside else suma_o_resta_vectores(intersect.point, bias)
+                refractOrigin = add_subtract(intersect.point, bias, True) if outside else add_subtract(intersect.point, bias)
                 refractColor = self.cast_ray(refractOrigin, refract, None, recursion + 1)
             
-            finalColor =  suma_o_resta_vectores(suma_o_resta_vectores([rc * kr for rc in reflectColor], [rc2 * (1-kr) for rc2 in refractColor]), specColor)
+            finalColor =  add_subtract(add_subtract([rc * kr for rc in reflectColor], [rc2 * (1-kr) for rc2 in refractColor]), specColor)
             
         finalColor = [oC*fC for oC, fC in zip(objectColor, finalColor)]
 
