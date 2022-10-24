@@ -224,150 +224,63 @@ class Disk(object):
                          textCoords=None)
                     
 
-"""
-class Piramid(object):
-    def __init__(self, position, size, material) -> None:
-        self.position = position
-        self.material = material
-        self.size = size # height, width
-        # self.n = ((normal[2]-normal[0])*(normal[1]-normal[0]))/abs((normal[2]-normal[0])*(normal[1]-normal[0]))
-
-        self.planes = [] # 4
-
-        # TODO: darle la posicion y orientacion correcta a los lados
-
-        # sides
-        self.planes.append(Plane(position=add_subtract(position, (normal, 0, 0)),
-                                 normal=(1,0,0), 
-                                 material=material))
-        self.planes.append(Plane(position=add_subtract(position, (0, normal, 0), True), 
-                                 normal=(-1,0,0), 
-                                 material=material))
-        self.planes.append(Plane(position=add_subtract(position, (0, 0, normal)),
-                                 normal=(1,0,0), 
-                                 material=material))
-        # bottom
-        self.planes.append(Plane(position=add_subtract(position, (0, 0, 0)), 
-                                 normal=(0,1,0),
-                                 material=material))
-
-
-        # TODO: dibujar unicamente lo que este dentro de los limites de los triangulos
-
-        # infinite?
-        self.boundsMin = [0,0,0]
-        self.boundsMax = [0,0,0]
-
-
-
-        #margen de error
-        epsilon = 0.001
-
-        for i in range(3):
-            self.boundsMin[i] = self.position[i] - (epsilon + normal)
-            self.boundsMax[i] = self.position[i] + (epsilon + normal)
-
-    
-    # TODO: aplicar ray intersect a los planos
-
-    def ray_intersect(self, orig, dir):
-        intersect = None
-        t = float("inf")
-
-        for plane in self.planes:
-            planeInter = plane.ray_intersect(orig, dir)
-
-            if planeInter is not None:
-                planePoint = planeInter.point
-
-                
-                if self.boundsMin[0] <= planePoint[0] <= self.boundsMax[0]:
-                    if self.boundsMin[1] <= planePoint[1] <= self.boundsMax[1]:
-                        if self.boundsMin[2] <= planePoint[2] <= self.boundsMax[2]:
-                            if planeInter.distance < t:
-                                t = planeInter.distance
-                                intersect = planeInter
-
-                            # Tex coords
-
-                            u, v = 0, 0
-
-                            # Las uvs de las caras de los lados
-                            if abs(plane.normal[0]) > 0:
-                                # Mapear uvs para el eje x, usando las coordenadas de Y y Z
-                                u = (planeInter.point[1] - self.boundsMin[1]) / (self.size[1])
-                                v = (planeInter.point[2] - self.boundsMin[2]) / (self.size[2])
-
-                            elif abs(plane.normal[1]) > 0:
-                                # Mapear uvs para el eje y, usando las coordenadas de X y Z
-                                u = (planeInter.point[0] - self.boundsMin[0]) / (self.size[0])
-                                v = (planeInter.point[2] - self.boundsMin[2]) / (self.size[2])
-
-                            elif abs(plane.normal[2]) > 0:
-                                # Mapear uvs para el eje z, usando las coordenadas de X y Y
-                                u = (planeInter.point[0] - self.boundsMin[0]) / (self.size[0])
-                                v = (planeInter.point[1] - self.boundsMin[1]) / (self.size[1])
-
-        # TODO: hacer el return correctamente
-
-
-        if intersect is None:
-            return None
-
-        return Intersect(
-            distance=t,
-            point=intersect.point,
-            normal=intersect.normal,
-            sceneObj=self,
-            textCoords=(u, v))
-"""
     
 class Triangle(object):
-    def __init__(self, position, vertices, normal, material) -> None:
+    def __init__(self, vertices, material, t = None) -> None:
         self.vertices = vertices # ((a,b,c), (a,b,c), (a,b,c))
 
-        self.n = cross_product(add_subtract(self.vertices[1], self.vertices[0],True), add_subtract(self.vertices[2], self.vertices[0],True))
+        self.v1_v2 = add_subtract(self.vertices[1], self.vertices[0],True)
+        self.v0_v2 = add_subtract(self.vertices[2], self.vertices[0],True)
 
-        self.plane = Plane(position, self.n, material)
+        self.n = cross_product(self.v1_v2, self.v0_v2)
+
         self.material = material
 
-
-        # self.vertices = vertices # ((a,b,c), (a,b,c), (a,b,c))
+        self.t = t
 
 
     def ray_intersect(self, orig, dir):
 
-        intersect = self.plane.ray_intersect(orig, dir)
-
-        if intersect is None:
-            return None
-
-        ro = self.vertices[0]
-
-        if dot_product(dir,self.n) == 0:
-            t = float('inf')
-            # return None
-        else:
-            t = dot_product(add_subtract(ro,orig,True), self.n)/dot_product(dir,self.n)
+        # if dot_product(dir,self.n) == 0:
+        #     t = float('inf')
+        #     # return None
+        # else:
+        #     t = dot_product(add_subtract(ro,orig,True), self.n)/dot_product(dir,self.n)
         
-        if abs(t) < 0.001 or abs(t) > float('inf'):
+        # if abs(t) < 0.001 or abs(t) > float('inf'):
+        #     return None
+
+        ray_direction = dot_product(self.n,dir)
+
+        if
+
+        d = -(dot_product(self.n, self.vertices[0]))
+
+        
+
+        self.t = -(dot_product(self.n, orig) + d) / dot_product(self.n, dir)
+
+        if self.t < 0:
             return None
 
-        point = orig + t * dir
-        # point = add_subtract(orig, vector_by_const(dir,t))
+        # point = orig + self.t * dir
+        point = add_subtract(orig, vector_by_const(dir,self.t))
 
         # vertex 0
         a = add_subtract(self.vertices[1],self.vertices[0], True)
         b = add_subtract(self.vertices[2],self.vertices[0], True)
-        c = add_subtract(intersect.point, self.vertices[0], True)
+        c = add_subtract(point, self.vertices[0], True)
 
-        if angle_between(a,b) <= angle_between(a,c):
+        # if angle_between(a,b) <= angle_between(a,c):
+        #     return None
+
+        if dot_product(self.n, ) < 0:
             return None
 
         # vertex 1
         a = add_subtract(self.vertices[0],self.vertices[1], True)
         b = add_subtract(self.vertices[2],self.vertices[1], True)
-        c = add_subtract(intersect.point, self.vertices[1], True)
+        c = add_subtract(point, self.vertices[1], True)
 
         if angle_between(b,a) <= angle_between(b,c):
             return None
@@ -375,27 +288,14 @@ class Triangle(object):
         # vertex 2
         a = add_subtract(self.vertices[0],self.vertices[2], True)
         b = add_subtract(self.vertices[1],self.vertices[2], True)
-        c = add_subtract(intersect.point, self.vertices[2], True)
+        c = add_subtract(point, self.vertices[2], True)
 
         if angle_between(a,b) <= angle_between(a,c):
             return None
 
-        return Intersect(distance=intersect.distance,
-                         point=point,
-                         normal=self.n,
-                         sceneObj=self,
-                         textCoords=intersect.textCoords)
-
-        # return Intersect(distance=t,
-        #                  point=point,
-        #                  normal=n,
-        #                  sceneObj=self,
-        #                  textCoords=None)
-
-        # return Intersect(
-        #     distance=intersect.distance,
-        #     point=point,
-        #     normal=n,
-        #     sceneObj=self,
-        #     textCoords=None)
+        return Intersect(distance=self.t,
+            point=point,
+            normal=self.n,
+            textCoords=None,
+            sceneObj=self)
 
