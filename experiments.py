@@ -1,5 +1,7 @@
 
 
+EPSILON = float(2.220446049250313e-16)
+
 def matrix_by_const(A: list[list[int or float]], a: int or float):
     return [[a*j for j in A[i]] for i in range(len(A))]
 

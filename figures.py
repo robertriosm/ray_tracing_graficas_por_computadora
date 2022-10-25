@@ -1,7 +1,7 @@
 
-from experiments import vector_add_const, vector_by_const
-from rmath import angle_between, cross_product, dot_product, magnitud_vector, norm_vector, normalize_vector, add_subtract
-from math import pi, atan2, acos
+from experiments import vector_add_const, vector_by_const, EPSILON
+from rmath import add, angle_between, cross_product, dot, dot_product, magnitud_vector, norm_vector, normalize_vector, add_subtract
+from math import pi, atan2, acos, fabs
 
 
 WHITE = (1,1,1)
@@ -227,6 +227,7 @@ class Disk(object):
     
 class Triangle(object):
     def __init__(self, vertices, material, t = None) -> None:
+        
         self.vertices = vertices # ((a,b,c), (a,b,c), (a,b,c))
 
         self.v1_v2 = add_subtract(self.vertices[1], self.vertices[0],True)
@@ -241,59 +242,82 @@ class Triangle(object):
 
     def ray_intersect(self, orig, dir):
 
-        # if dot_product(dir,self.n) == 0:
-        #     t = float('inf')
-        #     # return None
-        # else:
-        #     t = dot_product(add_subtract(ro,orig,True), self.n)/dot_product(dir,self.n)
-        
-        # if abs(t) < 0.001 or abs(t) > float('inf'):
-        #     return None
-
         ray_direction = dot_product(self.n,dir)
 
-        if
+        if fabs(ray_direction) < EPSILON:
+            return None
+        
 
         d = -(dot_product(self.n, self.vertices[0]))
 
+
+        self.t = -(dot_product(self.n, orig) + d) / ray_direction
         
-
-        self.t = -(dot_product(self.n, orig) + d) / dot_product(self.n, dir)
-
         if self.t < 0:
             return None
 
         # point = orig + self.t * dir
+
         point = add_subtract(orig, vector_by_const(dir,self.t))
 
+
+        # CHECK IF RAY IS INSIDE TRIANGLE VERTICES
+         
         # vertex 0
+
+
         a = add_subtract(self.vertices[1],self.vertices[0], True)
-        b = add_subtract(self.vertices[2],self.vertices[0], True)
-        c = add_subtract(point, self.vertices[0], True)
+        a_point = add_subtract(point, self.vertices[0])
+        c = cross_product(a, a_point)
+
+        if dot_product(self.n, c) < 0:
+            return None
+        
+        
+
+        # b = add_subtract(self.vertices[2],self.vertices[0], True)
+        # c = add_subtract(point, self.vertices[0], True)
 
         # if angle_between(a,b) <= angle_between(a,c):
         #     return None
 
-        if dot_product(self.n, ) < 0:
-            return None
+        # if dot_product(self.n, ) < 0:
+        #     return None
 
         # vertex 1
-        a = add_subtract(self.vertices[0],self.vertices[1], True)
-        b = add_subtract(self.vertices[2],self.vertices[1], True)
-        c = add_subtract(point, self.vertices[1], True)
 
-        if angle_between(b,a) <= angle_between(b,c):
+        a = add_subtract(self.vertices[2],self.vertices[1], True)
+        a_point = add_subtract(point, self.vertices[1])
+        c = cross_product(a, a_point)
+
+        if dot_product(self.n, c) < 0:
             return None
+
+        # a = add_subtract(self.vertices[0],self.vertices[1], True)
+        # b = add_subtract(self.vertices[2],self.vertices[1], True)
+        # c = add_subtract(point, self.vertices[1], True)
+
+        # if angle_between(b,a) <= angle_between(b,c):
+        #     return None
 
         # vertex 2
-        a = add_subtract(self.vertices[0],self.vertices[2], True)
-        b = add_subtract(self.vertices[1],self.vertices[2], True)
-        c = add_subtract(point, self.vertices[2], True)
 
-        if angle_between(a,b) <= angle_between(a,c):
+        a = add_subtract(self.vertices[0],self.vertices[2], True)
+        a_point = add_subtract(point, self.vertices[2])
+        c = cross_product(a, a_point)
+
+        if dot_product(self.n, c) < 0:
             return None
 
-        return Intersect(distance=self.t,
+        # a = add_subtract(self.vertices[0],self.vertices[2], True)
+        # b = add_subtract(self.vertices[1],self.vertices[2], True)
+        # c = add_subtract(point, self.vertices[2], True)
+
+        # if angle_between(a,b) <= angle_between(a,c):
+        #     return None
+
+        return Intersect(
+            distance=self.t,
             point=point,
             normal=self.n,
             textCoords=None,
