@@ -1,5 +1,5 @@
 
-from experiments import vector_add_const, vector_by_const, EPSILON
+from experiments import vector_add_const, vector_by_const
 from rmath import add, angle_between, cross_product, dot, dot_product, magnitud_vector, norm_vector, normalize_vector, add_subtract
 from math import pi, atan2, acos, fabs
 
@@ -59,8 +59,9 @@ class Sphere(object):
         normal = add_subtract(P, self.center, True)
         normal = norm_vector(normal) 
 
-        u = atan2(normal[2], normal[0])/ (2 * pi) + 0.5
-        v = acos(-normal[1])/pi
+        # texture coords
+        u = atan2(normal[2], normal[0]) / (2 * pi) + 0.5
+        v = acos(-normal[1]) / pi
         uvs  = (u, v)
 
         return Intersect(distance = t0,
@@ -233,128 +234,64 @@ class Triangle(object):
         self.v0_v1 = add_subtract(self.vertices[1], self.vertices[0], True)
         self.v0_v2 = add_subtract(self.vertices[2], self.vertices[0], True)
 
-        self.n = cross_product(self.v0_v2, self.v0_v2)
+        self.n = cross_product(self.v0_v1, self.v0_v2)
 
         self.material = material
-
         self.t = t
+
+        self.plane = Plane((0,0,0), self.n, material)
 
 
     def ray_intersect(self, orig, dir):
-
-        # ray direction
-
-        pvector = cross_product(dir,self.v0_v2)
-
-        det = dot_product(self.v0_v1,pvector)
-
-        if det < 0.0001:
-            return None
-        
-        inverse_det = 1/det
-
-        tvec = add_subtract(orig, self.vertices[0], True)
-
-        u = dot_product(tvec, pvector) * inverse_det
-
-        if u < 0 or u > 1:
-            return None
-
-        qvec = cross_product(tvec, self.v0_v1)
-
-        v = dot_product(dir, qvec) * inverse_det
-
-        if v < 0 or u+v > 1:
-            return None
-
-        point = add_subtract(orig, vector_by_const(dir,self.t))
-
-        # point = dot_product(self.v0_v2, qvec) * inverse_det
-        
-        return Intersect(
-            distance=self.t,
-            point=point,
-            normal=self.n,
-            textCoords=None,
-            sceneObj=self)
-
-
+        """
+        Check https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+        for reference
         """
 
+        # find hit_point
+
+        # check if the ray and the plane are parallel to each other
 
         ray_direction = dot_product(self.n,dir)
 
-        if fabs(ray_direction) < EPSILON:
-            return None
+        if fabs(ray_direction) < 0.0001:
+            return None # they are parallel, no intersect
         
-
+        # find D
         d = -(dot_product(self.n, self.vertices[0]))
 
-
-        self.t = -(dot_product(self.n, orig) + d) / ray_direction
+        # find T
+        self.t = -((dot_product(self.n, orig) + d) / ray_direction)
         
         if self.t < 0:
             return None
 
         # point = orig + self.t * dir
+        point = add_subtract(orig, vector_by_const(dir, self.t))
 
-        point = add_subtract(orig, vector_by_const(dir,self.t))
-
-
-        # CHECK IF RAY IS INSIDE TRIANGLE VERTICES
+        # CHECK IF RAY IS INSIDE VERTICES
          
         # vertex 0
-
-
-        a = add_subtract(self.vertices[1],self.vertices[0], True)
-        a_point = add_subtract(point, self.vertices[0])
-        c = cross_product(a, a_point)
-
+        edge0 = add_subtract(self.vertices[1],self.vertices[0], True)
+        vp0 = add_subtract(point, self.vertices[0], True)
+        c = cross_product(edge0, vp0)
         if dot_product(self.n, c) < 0:
             return None
         
-        
-
-        # b = add_subtract(self.vertices[2],self.vertices[0], True)
-        # c = add_subtract(point, self.vertices[0], True)
-
-        # if angle_between(a,b) <= angle_between(a,c):
-        #     return None
-
-        # if dot_product(self.n, ) < 0:
-        #     return None
-
         # vertex 1
-
-        a = add_subtract(self.vertices[2],self.vertices[1], True)
-        a_point = add_subtract(point, self.vertices[1])
-        c = cross_product(a, a_point)
-
+        edge1 = add_subtract(self.vertices[2],self.vertices[1], True)
+        vp1 = add_subtract(point, self.vertices[1], True)
+        c = cross_product(edge1, vp1)
         if dot_product(self.n, c) < 0:
             return None
-
-        # a = add_subtract(self.vertices[0],self.vertices[1], True)
-        # b = add_subtract(self.vertices[2],self.vertices[1], True)
-        # c = add_subtract(point, self.vertices[1], True)
-
-        # if angle_between(b,a) <= angle_between(b,c):
-        #     return None
 
         # vertex 2
-
-        a = add_subtract(self.vertices[0],self.vertices[2], True)
-        a_point = add_subtract(point, self.vertices[2])
-        c = cross_product(a, a_point)
-
+        edge2 = add_subtract(self.vertices[0],self.vertices[2], True)
+        vp2 = add_subtract(point, self.vertices[2], True)
+        c = cross_product(edge2, vp2)
         if dot_product(self.n, c) < 0:
             return None
 
-        # a = add_subtract(self.vertices[0],self.vertices[2], True)
-        # b = add_subtract(self.vertices[1],self.vertices[2], True)
-        # c = add_subtract(point, self.vertices[2], True)
-
-        # if angle_between(a,b) <= angle_between(a,c):
-        #     return None
 
         return Intersect(
             distance=self.t,
@@ -362,5 +299,12 @@ class Triangle(object):
             normal=self.n,
             textCoords=None,
             sceneObj=self)
+         
 
-        """
+# class Star(object):
+#     def __init__(self, vertices, material, t = 0.0) -> None:
+#         t1 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
+#         t2 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
+#         t3 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
+#         t4 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
+#         t5 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
