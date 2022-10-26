@@ -6,6 +6,8 @@ from figures import *
 from lights import *
 from math import tan, pi
 
+from rmath import vectors_product
+
 
 STEPS = 1
 MAX_RECURSION_DEPTH = 3
@@ -188,8 +190,9 @@ class Raytracer(object):
 
         if material.texture and intersect.textCoords:
             texColor = material.texture.getColor(intersect.textCoords[0], intersect.textCoords[1])
-            if texColor is not None:
-                finalColor = vector_by_const(finalColor, texColor)
+            finalColor = vectors_product(finalColor, texColor)
+            # if texColor is not None:
+            #     finalColor = vector_by_const(finalColor, texColor)
 
         r = min(1, finalColor[0])
         g = min(1, finalColor[1])
