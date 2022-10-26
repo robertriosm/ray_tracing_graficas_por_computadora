@@ -16,7 +16,6 @@ def reflectVector(normal, direction):
 
 
 def reflactVector(normal, direction, ior):
-    #Snell´s Law
     cosi = max(-1, min(1, dot_product(direction, normal)))
     etai = 1
     etat = ior
@@ -30,7 +29,7 @@ def reflactVector(normal, direction, ior):
     eta = etai / etat
     k = 1 - (eta**2) * (1-(cosi**2))
 
-    if k < 0: #Total internal reflection
+    if k < 0: 
         return None
 
     R = add_subtract([eta *(d) for d in direction],  [(eta * cosi - k **0.5) * n for n in  normal])
@@ -38,7 +37,6 @@ def reflactVector(normal, direction, ior):
     
 
 def fresnel(normal, direction, ior):
-    #Snell´s Law  
     cosi = max(-1, min(1, dot_product(direction, normal)))
     etai = 1
     etat = ior
@@ -48,7 +46,7 @@ def fresnel(normal, direction, ior):
     
     sint = etai / etat * (max(0, 1 - cosi**2) ** 0.5)
 
-    if sint >= 1: #Total internal reflection
+    if sint >= 1: 
         return 1
     
     cost = max(0, 1 - sint**2) ** 0.5

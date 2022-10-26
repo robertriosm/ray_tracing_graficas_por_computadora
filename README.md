@@ -4,4 +4,4 @@
 
 ### el archivo a ejecutar es ray_tracer.py
 
-### el resultado se llama esferas.bmp
+### el resultado esta dentro de la carpeta outputs

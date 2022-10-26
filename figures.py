@@ -191,6 +191,8 @@ class AABB(object): # axis aligned bounding box
 
         if intersect is None:
             return None
+        
+        
 
         return Intersect(
             distance=t,
@@ -224,7 +226,6 @@ class Disk(object):
                          sceneObj=self,
                          textCoords=None)
                     
-
     
 class Triangle(object):
     def __init__(self, vertices, material, t = 0.0) -> None:
@@ -300,11 +301,3 @@ class Triangle(object):
             textCoords=None,
             sceneObj=self)
          
-
-# class Star(object):
-#     def __init__(self, vertices, material, t = 0.0) -> None:
-#         t1 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
-#         t2 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
-#         t3 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
-#         t4 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
-#         t5 = Triangle(vertices=((-2, 2, -10), (-3, 4, -10), (-4, 4, -11)), material=material, t=t)
