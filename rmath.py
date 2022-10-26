@@ -74,10 +74,10 @@ def add_subtract(v1: list, v2: list, restar = False):
     factor = -1 if restar else 1
     if not len(v2) == len(v1):
         return
-    vector_res = []
+    result = []
     for i in range(len(v1)):
-        vector_res.append(v1[i]+factor*v2[i])
-    return vector_res
+        result.append(v1[i]+factor*v2[i])
+    return result
 
 
 def add(A, B):

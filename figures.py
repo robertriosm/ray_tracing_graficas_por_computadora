@@ -226,14 +226,14 @@ class Disk(object):
 
     
 class Triangle(object):
-    def __init__(self, vertices, material, t = None) -> None:
+    def __init__(self, vertices, material, t = 0.0) -> None:
         
         self.vertices = vertices # ((a,b,c), (a,b,c), (a,b,c))
 
-        self.v1_v2 = add_subtract(self.vertices[1], self.vertices[0],True)
-        self.v0_v2 = add_subtract(self.vertices[2], self.vertices[0],True)
+        self.v0_v1 = add_subtract(self.vertices[1], self.vertices[0], True)
+        self.v0_v2 = add_subtract(self.vertices[2], self.vertices[0], True)
 
-        self.n = cross_product(self.v1_v2, self.v0_v2)
+        self.n = cross_product(self.v0_v2, self.v0_v2)
 
         self.material = material
 
@@ -241,6 +241,46 @@ class Triangle(object):
 
 
     def ray_intersect(self, orig, dir):
+
+        # ray direction
+
+        pvector = cross_product(dir,self.v0_v2)
+
+        det = dot_product(self.v0_v1,pvector)
+
+        if det < 0.0001:
+            return None
+        
+        inverse_det = 1/det
+
+        tvec = add_subtract(orig, self.vertices[0], True)
+
+        u = dot_product(tvec, pvector) * inverse_det
+
+        if u < 0 or u > 1:
+            return None
+
+        qvec = cross_product(tvec, self.v0_v1)
+
+        v = dot_product(dir, qvec) * inverse_det
+
+        if v < 0 or u+v > 1:
+            return None
+
+        point = add_subtract(orig, vector_by_const(dir,self.t))
+
+        # point = dot_product(self.v0_v2, qvec) * inverse_det
+        
+        return Intersect(
+            distance=self.t,
+            point=point,
+            normal=self.n,
+            textCoords=None,
+            sceneObj=self)
+
+
+        """
+
 
         ray_direction = dot_product(self.n,dir)
 
@@ -323,3 +363,4 @@ class Triangle(object):
             textCoords=None,
             sceneObj=self)
 
+        """
